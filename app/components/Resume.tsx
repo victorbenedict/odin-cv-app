@@ -1,4 +1,5 @@
 import Contact from './sections/Contact';
+import Experience from './sections/Experience';
 import FullName from './sections/Name';
 import Skills from './sections/Skills';
 
@@ -9,6 +10,7 @@ export default function Resume() {
         <FullName />
         <Contact />
         <Skills />
+        <Experience />
       </div>
     </div>
   );

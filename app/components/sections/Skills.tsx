@@ -24,7 +24,7 @@ export default function Skills() {
       <h5 className='border-b scroll-m-20 text-l font-semibold tracking-tight'>
         Skills
       </h5>
-      <Overlay data={data} onSave={handleOnSave} withAdd>
+      <Overlay data={data} onSave={handleOnSave} withAdd withDelete>
         <ul className='flex flex-wrap list-disc pl-5 text-black/75'>
           {data.map((item, index) => {
             return <SkillItem key={index}>{item.value}</SkillItem>;

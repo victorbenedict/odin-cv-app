@@ -5,9 +5,15 @@ export default function Overlay({
   data,
   onSave,
   withAdd = false,
+  withDelete = false,
 }: IFormProps) {
   return (
-    <EditForm data={data} onSave={onSave} withAdd={withAdd}>
+    <EditForm
+      data={data}
+      onSave={onSave}
+      withAdd={withAdd}
+      withDelete={withDelete}
+    >
       <div className='hover:bg-slate-200 cursor-pointer'>{children}</div>
     </EditForm>
   );

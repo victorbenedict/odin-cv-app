@@ -12,14 +12,17 @@ import {
 } from '@/components/ui/dialog';
 
 import { CustomEvent, InputData } from '@/lib/types';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, MouseEvent, ReactNode, useEffect, useState } from 'react';
 import InputField from './InputField';
+import { generateId } from '@/lib/utils';
 
 export interface IFormProps {
   children?: ReactNode;
   data: InputData[];
   onSave?: (e: CustomEvent) => void;
   withAdd?: boolean;
+  withDelete?: boolean;
+  AddOnly?: boolean;
 }
 
 export function EditForm({
@@ -27,9 +30,10 @@ export function EditForm({
   children,
   onSave,
   withAdd = false,
+  withDelete = false,
+  AddOnly = false,
 }: IFormProps) {
   const [entry, setEntry] = useState<InputData[]>(data);
-
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     const id = e.target.id;
@@ -50,11 +54,19 @@ export function EditForm({
   };
 
   const handleAdd = () => {
-    const generateId = Date.now().toString();
     setEntry((prevData) => {
       return [...prevData, { id: generateId, value: '' } as InputData];
     });
   };
+
+  const handleDelete = (e: MouseEvent<HTMLButtonElement>) => {
+    const id = e.currentTarget.id;
+    setEntry((prevData) => prevData.filter((item) => item.id !== id));
+  };
+
+  useEffect(() => {
+    console.log(entry);
+  }, [entry]);
 
   return (
     <Dialog>
@@ -67,12 +79,14 @@ export function EditForm({
           </DialogDescription>
         </DialogHeader>
         <div className='grid gap-4 py-4'>
-          {entry.map((item, index) => {
+          {entry.map((item) => {
             return (
               <InputField
-                key={index}
+                key={item.id}
                 data={item}
-                onChange={(e) => handleOnChange(e)}
+                onChange={handleOnChange}
+                onDelete={handleDelete}
+                withDelete={withDelete}
               />
             );
           })}
