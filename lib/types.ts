@@ -1,18 +1,18 @@
 import { SyntheticEvent } from 'react';
 
-export type CustomEvent = SyntheticEvent & { target: { value: InputData[] } };
+export type CustomEvent = SyntheticEvent & { target: { value: string } };
 
 export type InputData = {
   id: string;
   label?: string;
-  value: string | string[];
+  value: string;
 };
 
 export type ExperienceData = {
-  id: string;
-  companyName: InputData;
-  position: InputData;
-  location: InputData;
-  date: InputData;
-  contribution: InputData & { value: string[] };
+  companyId: string;
+  data: {
+    id: string;
+    label?: string;
+    value: string | string[];
+  }[];
 };

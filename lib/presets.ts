@@ -38,27 +38,31 @@ export const presetSkills: InputData[] = Array.from(
 
 export const presetExperience: ExperienceData[] = [
   {
-    id: 'companyA',
-    companyName: { id: 'companyName', label: 'Company', value: 'Company A' },
-    position: { id: 'position', label: 'Position', value: 'Manager' },
-    location: { id: 'location', label: 'Location', value: 'USA' },
-    date: { id: 'date', label: 'Date', value: '2023 - 2024' },
-    contribution: {
-      id: 'contributions',
-      label: 'Contributions',
-      value: ['Contribution A', 'Contribution B'],
-    },
+    companyId: 'companyA',
+    data: [
+      { id: 'companyName', label: 'Company', value: 'Company A' },
+      { id: 'position', label: 'Position', value: 'Manager' },
+      { id: 'location', label: 'Location', value: 'USA' },
+      { id: 'date', label: 'Date', value: '2023 - 2024' },
+      {
+        id: 'contributions',
+        label: 'Contributions',
+        value: ['Contribution A', 'Contribution B'],
+      },
+    ],
   },
   {
-    id: 'companyB',
-    companyName: { id: 'companyName', label: 'Company', value: 'Company B' },
-    position: { id: 'position', label: 'Position', value: 'Sales' },
-    location: { id: 'location', label: 'Location', value: 'UK' },
-    date: { id: 'date', label: 'Date', value: '2021 - 2023' },
-    contribution: {
-      id: 'contributions',
-      label: 'Contributions',
-      value: ['Contribution A', 'Contribution B'],
-    },
+    companyId: 'companyB',
+    data: [
+      { id: 'companyName', label: 'Company', value: 'Company B' },
+      { id: 'position', label: 'Position', value: 'Sales' },
+      { id: 'location', label: 'Location', value: 'UK' },
+      { id: 'date', label: 'Date', value: '2021 - 2023' },
+      {
+        id: 'contributions',
+        label: 'Contributions',
+        value: ['Contribution A', 'Contribution B'],
+      },
+    ],
   },
 ];

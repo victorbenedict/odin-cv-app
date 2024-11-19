@@ -1,6 +1,6 @@
 import Contact from './sections/Contact';
 import Experience from './sections/Experience';
-import FullName from './sections/Name';
+import FullName from './sections/FullName';
 import Skills from './sections/Skills';
 
 export default function Resume() {
