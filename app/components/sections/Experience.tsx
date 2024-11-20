@@ -19,6 +19,13 @@ import { generateId } from '@/lib/utils';
 import { ChangeEvent, ReactNode, useEffect, useState } from 'react';
 import { FiDelete } from 'react-icons/fi';
 
+interface IContributionInputProps {
+  id: string;
+  label?: string;
+  data: string | string[];
+  onChange?: (e: string[]) => void;
+}
+
 interface IEditExperienceProps {
   children: ReactNode;
   data: ExperienceData['data'];
@@ -27,88 +34,93 @@ interface IEditExperienceProps {
 
 interface IExperienceCardProps {
   data: ExperienceData['data'];
-  onSave?: (e: CustomEvent) => void;
+  onSave?: (e: ExperienceData['data']) => void;
 }
 
-function ExperienceCard({ data, onSave }: IExperienceCardProps) {
-  const [companyName, position, location, date, contributions] = data.map(
-    (value) => value
+const ContributionInput = ({
+  id,
+  label,
+  data,
+  onChange,
+}: IContributionInputProps) => {
+  const [contributions, setContributions] = useState(
+    Array.isArray(data) ? data : [data]
   );
-
-  const contributionArr = Array.isArray(contributions.value)
-    ? contributions.value
-    : [contributions.value];
-
-  const handleOnSave = (e: CustomEvent) => {
-    onSave?.(e);
+  const handleInputChange = (
+    e: ChangeEvent<HTMLTextAreaElement>,
+    index: number
+  ) => {
+    const newValue = e.target.value;
+    setContributions(
+      contributions.map((item, i) => (i === index ? newValue : item))
+    );
+    handleOnChange();
   };
 
-  return (
-    <li>
-      <EditExperience data={data} onSave={handleOnSave}>
-        <div>
-          <div className='font-bold'>
-            <span>{companyName.value}</span> | <span>{location.value}</span>
-          </div>
-          <div className='font-bold'>
-            <span>{position.value}</span> | <span>{date.value}</span>
-          </div>
-          <ul className='list-disc pl-5'>
-            {contributionArr.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      </EditExperience>
-    </li>
-  );
-}
+  const handleOnDelete = (index: number) => {
+    setContributions((prev) => prev.filter((_, i) => i !== index));
+    handleOnChange();
+  };
 
-export default function Experience() {
-  const [data, setData] = useState<ExperienceData[]>(presetExperience);
-  // console.log('Experience data', data);
+  const handleOnChange = () => {
+    onChange?.(contributions);
+  };
+
+  useEffect(() => {
+    setContributions(Array.isArray(data) ? data : [data]);
+  }, [data]);
 
   return (
-    <div className='group'>
-      <div className='flex justify-between items-end border-b scroll-m-20 text-l font-semibold tracking-tight'>
-        <h5>Experience</h5>
-        <Button
-          variant='ghost'
-          className='opacity-0 group-hover:opacity-100 transition-opacity duration-300'
-        >
-          Add Experience
-        </Button>
-      </div>
-      <ul className='flex flex-col gap-2.5 pt-2.5 text-black/75'>
-        {data.map((item, index) => {
+    <div className='col-span-4 flex gap-2'>
+      <Label htmlFor={id} className=''>
+        {label}
+      </Label>
+      <div className='flex flex-col w-full gap-2'>
+        {contributions.map((contribution, index) => {
           return (
-            <ExperienceCard
-              key={index}
-              data={item.data}
-              // onSave={(e) => handleOnSave(e, item.companyId)}
-            />
+            <div key={index} className='flex'>
+              <Textarea
+                id={contribution}
+                className=''
+                onChange={(e) => handleInputChange(e, index)}
+                value={contribution}
+              />
+              <Button
+                id={id}
+                variant='ghost'
+                size='icon'
+                className='text-gray-600 text-center'
+                onClick={(e) => handleOnDelete(index)}
+              >
+                <FiDelete />
+              </Button>
+            </div>
           );
         })}
-      </ul>
+      </div>
     </div>
   );
-}
+};
 
 function EditExperience({ children, data, onSave }: IEditExperienceProps) {
-  const [experience, setExperience] = useState<ExperienceData['data']>();
+  const [experience, setExperience] = useState<ExperienceData['data']>([
+    { id: '', value: '', label: '' },
+  ]);
   const [open, setOpen] = useState(false);
-  // console.log('EditExperience', experience);
-  const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // const id = e.target.id;
-    // const newValue = e.target.value;
-    // setSkills((prev) =>
-    //   prev.map((item) => (item.id === id ? { ...item, value: newValue } : item))
-    // );
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const id = e.target.id;
+    const newValue = e.target.value;
+    setExperience(
+      experience?.map((prev) =>
+        prev.id === id ? { ...prev, value: newValue } : prev
+      )
+    );
   };
-  // console.log('ExperienceCard', experience);
-  // const handleOnSave = () => {
-  //   onSave?.(experience);
-  // };
+
+  const handleOnSave = () => {
+    onSave?.(experience);
+  };
 
   // const handleAdd = () => {
   //   setSkills((prev) => [...prev, { id: generateId(), label: '', value: '' }]);
@@ -118,6 +130,24 @@ function EditExperience({ children, data, onSave }: IEditExperienceProps) {
   //   const id = e.currentTarget.id;
   //   setSkills(skills.filter((item) => item.id != id));
   // };
+
+  const handleContributionChange = (e: string[]) => {
+    setExperience(
+      experience?.map((item) =>
+        item.id === 'contributions' ? { ...item, value: e } : item
+      )
+    );
+  };
+
+  const handleAddContribution = () => {
+    setExperience(
+      experience?.map((prev) =>
+        prev.id === 'contributions'
+          ? { ...prev, value: [...prev.value, ''] }
+          : prev
+      )
+    );
+  };
 
   useEffect(() => {
     setExperience(data);
@@ -150,7 +180,7 @@ function EditExperience({ children, data, onSave }: IEditExperienceProps) {
                     <Input
                       id={item.id}
                       className='col-span-3'
-                      onChange={handleOnChange}
+                      onChange={handleInputChange}
                       value={item.value}
                     />
                   </>
@@ -160,6 +190,7 @@ function EditExperience({ children, data, onSave }: IEditExperienceProps) {
                       id={item.id}
                       label={item.label}
                       data={item.value}
+                      onChange={handleContributionChange}
                     />
                   </>
                 )}
@@ -168,11 +199,11 @@ function EditExperience({ children, data, onSave }: IEditExperienceProps) {
           })}
         </ul>
         <DialogFooter className='flex flex-row gap-2 justify-end'>
-          <Button variant={'secondary'} onClick={() => {}}>
+          <Button variant={'secondary'} onClick={handleAddContribution}>
             Add Contribution
           </Button>
           <DialogClose asChild>
-            <Button type='submit' onClick={() => {}}>
+            <Button type='submit' onClick={handleOnSave}>
               Save changes
             </Button>
           </DialogClose>
@@ -182,42 +213,70 @@ function EditExperience({ children, data, onSave }: IEditExperienceProps) {
   );
 }
 
-interface IContributionInputProps {
-  id: string;
-  label?: string;
-  data: string | string[];
-}
+function ExperienceCard({ data, onSave }: IExperienceCardProps) {
+  const [companyName, position, location, date, contributions] = data.map(
+    (value) => value
+  );
 
-const ContributionInput = ({ id, label, data }: IContributionInputProps) => {
-  const contributionArr = Array.isArray(data) ? data : [data];
+  const contributionArr = Array.isArray(contributions.value)
+    ? contributions.value
+    : [contributions.value];
+
+  const handleOnSave = (e: ExperienceData['data']) => {
+    onSave?.(e);
+  };
 
   return (
-    <>
-      <Label htmlFor={id} className='col-span-1 text-right'>
-        {label}
-      </Label>
-      {contributionArr.map((contribution) => {
-        return (
-          <>
-            <Textarea
-              id={contribution}
-              className='col-span-2 col-end-4'
-              // onChange={handleOnChange}
-              // value={contribution}
-              defaultValue={contribution}
-            />
-            <Button
-              id={id}
-              variant='ghost'
-              size='icon'
-              className='text-gray-600 col-span-1 text-center'
-              // onClick={handleDelete}
-            >
-              <FiDelete />
-            </Button>
-          </>
-        );
-      })}
-    </>
+    <li>
+      <EditExperience data={data} onSave={handleOnSave}>
+        <div>
+          <div className='font-bold'>
+            <span>{companyName.value}</span> | <span>{location.value}</span>
+          </div>
+          <div className='font-bold'>
+            <span>{position.value}</span> | <span>{date.value}</span>
+          </div>
+          <ul className='list-disc pl-5'>
+            {contributionArr.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      </EditExperience>
+    </li>
   );
-};
+}
+
+export default function Experience() {
+  const [data, setData] = useState<ExperienceData[]>(presetExperience);
+  const handleOnSave = (e: ExperienceData['data'], id: string) => {
+    setData(
+      data.map((prev) => (prev.companyId === id ? { ...prev, data: e } : prev))
+    );
+  };
+
+  return (
+    <div className='group'>
+      <div className='flex justify-between items-end border-b scroll-m-20 text-l font-semibold tracking-tight'>
+        <h5>Experience</h5>
+        <Button
+          variant='ghost'
+          className='opacity-0 group-hover:opacity-100 transition-opacity duration-300'
+        >
+          Add Experience
+        </Button>
+      </div>
+      <ul className='flex flex-col gap-2.5 pt-2.5 text-black/75'>
+        {data.map((item, index) => {
+          return (
+            <ExperienceCard
+              key={index}
+              data={item.data}
+              onSave={(e) => handleOnSave(e, item.companyId)}
+            />
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
